@@ -2,12 +2,7 @@
 
 <div align="center">
 
-![FinFlow Banner](docs/banner.png)
 
-[![Hackathon](https://img.shields.io/badge/Protex%20Hackathon-2026-7c5cfc?style=for-the-badge)](https://protex.dev)
-[![Track](https://img.shields.io/badge/Track-Personal%20Finance%20%26%20Wealth-22d3ee?style=for-the-badge)]()
-[![Gen Z](https://img.shields.io/badge/Built%20For-Gen%20Z-f472b6?style=for-the-badge)]()
-[![License](https://img.shields.io/badge/License-MIT-34d399?style=for-the-badge)](LICENSE)
 
 **From passive tracking to active behavioral coaching. Think Noom, but for spending.**
 
@@ -241,7 +236,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/finflow
 
 ## 👥 Team
 
-Built with ❤️ at **Protex Hackathon 2026** — Personal Finance & Wealth track.
+Built with ❤️ by *Commit Crew* at **Protex Hackathon 2026** — Personal Finance & Wealth track.
 
 ---
 
