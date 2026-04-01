@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FinFlow — Your AI Money Copilot</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #18181f;
+  --card: #1c1c26;
+  --card2: #22222e;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f0f8;
+  --text2: #9494b0;
+  --text3: #5a5a78;
+  --accent: #7c5cfc;
+  --accent2: #a78bfa;
+  --accent3: #c4b5fd;
+  --green: #34d399;
+  --red: #f87171;
+  --yellow: #fbbf24;
+  --cyan: #22d3ee;
+  --pink: #f472b6;
+  --orange: #fb923c;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --glow: 0 0 40px rgba(124,92,252,0.15);
+}
+[data-theme="light"] {
+  --bg: #f4f4fb;
+  --bg2: #eeeef8;
+  --bg3: #e8e8f4;
+  --card: #ffffff;
+  --card2: #f8f8ff;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1a2e;
+  --text2: #5a5a7a;
+  --text3: #9a9ab0;
+  --shadow: 0 8px 32px rgba(0,0,0,0.08);
+  --glow: 0 0 40px rgba(124,92,252,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
+
+/* NOISE OVERLAY */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4;}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh;position:relative;z-index:1;}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.logo{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:32px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;background:linear-gradient(135deg,var(--accent2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-section{margin-bottom:24px;}
+.nav-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:0 12px;margin-bottom:8px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all 0.2s;color:var(--text2);font-size:14px;font-weight:500;border:1px solid transparent;}
+.nav-item:hover{background:var(--card);color:var(--text);}
+.nav-item.active{background:linear-gradient(135deg,rgba(124,92,252,0.2),rgba(34,211,238,0.1));border-color:rgba(124,92,252,0.3);color:var(--text);}
+.nav-item .icon{font-size:17px;width:20px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+.sidebar-bottom{margin-top:auto;}
+.user-card{display:flex;align-items:center;gap:10px;padding:12px;background:var(--card);border-radius:var(--radius-sm);border:1px solid var(--border);}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--pink));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;}
+.user-info .name{font-size:13px;font-weight:600;}
+.user-info .plan{font-size:11px;color:var(--accent2);}
+.theme-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;transition:color 0.2s;}
+.theme-btn:hover{color:var(--text);}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;overflow:hidden;}
+.topbar{display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid var(--border);background:var(--bg2);}
+.page-title{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.health-score{display:flex;align-items:center;gap:8px;padding:8px 14px;background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(34,211,238,0.1));border:1px solid rgba(52,211,153,0.3);border-radius:20px;font-size:13px;font-weight:600;color:var(--green);}
+.notif-btn{width:38px;height:38px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;position:relative;}
+.notif-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--bg2);}
+.content{padding:24px 28px;overflow-y:auto;flex:1;}
+
+/* PAGE SECTIONS */
+.page{display:none;}
+.page.active{display:block;animation:fadeUp 0.4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:border-color 0.2s,box-shadow 0.2s;}
+.card:hover{border-color:var(--border2);box-shadow:var(--shadow);}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:500;color:var(--text2);}
+.card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+
+/* STAT CARDS */
+.stat-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;line-height:1;}
+.stat-sub{font-size:12px;color:var(--text3);margin-top:6px;}
+.stat-change{font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:3px;margin-top:8px;padding:3px 8px;border-radius:20px;}
+.stat-change.up{background:rgba(52,211,153,0.15);color:var(--green);}
+.stat-change.down{background:rgba(248,113,113,0.15);color:var(--red);}
+
+/* CHART CONTAINERS */
+.chart-wrap{position:relative;height:200px;}
+.chart-wrap-tall{position:relative;height:260px;}
+
+/* TRANSACTIONS */
+.txn-list{display:flex;flex-direction:column;gap:8px;}
+.txn-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);transition:all 0.2s;cursor:pointer;}
+.txn-item:hover{border-color:var(--border2);background:var(--card2);}
+.txn-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.txn-info{flex:1;}
+.txn-name{font-size:14px;font-weight:500;}
+.txn-meta{font-size:12px;color:var(--text3);margin-top:2px;}
+.txn-amt{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;}
+.txn-amt.debit{color:var(--red);}
+.txn-amt.credit{color:var(--green);}
+.tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* PROGRESS */
+.progress-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:4px;transition:width 1s ease;}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 140px);}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;}
+.chat-messages::-webkit-scrollbar{width:4px;}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.msg{display:flex;gap:12px;animation:fadeUp 0.3s ease;}
+.msg.user{flex-direction:row-reverse;}
+.msg-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.msg-avatar.ai{background:linear-gradient(135deg,var(--accent),var(--cyan));}
+.msg-avatar.user{background:linear-gradient(135deg,var(--pink),var(--orange));}
+.msg-bubble{max-width:70%;padding:14px 18px;border-radius:18px;font-size:14px;line-height:1.6;}
+.msg-bubble.ai{background:var(--card2);border:1px solid var(--border);border-radius:18px 18px 18px 4px;}
+.msg-bubble.user{background:linear-gradient(135deg,var(--accent),rgba(124,92,252,0.7));color:#fff;border-radius:18px 18px 4px 18px;}
+.msg-bubble ul{margin:8px 0 4px 16px;}
+.msg-bubble li{margin-bottom:4px;}
+.chat-input-wrap{padding:16px 20px;border-top:1px solid var(--border);background:var(--bg2);}
+.chat-input-row{display:flex;gap:10px;align-items:center;}
+.chat-input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+.chat-input:focus{border-color:var(--accent);}
+.chat-send-btn{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--cyan));border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:opacity 0.2s;color:#fff;}
+.chat-send-btn:hover{opacity:0.85;}
+.chat-send-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.quick-prompts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.quick-prompt{padding:6px 14px;background:var(--card2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;transition:all 0.2s;color:var(--text2);}
+.quick-prompt:hover{border-color:var(--accent);color:var(--text);background:rgba(124,92,252,0.1);}
+.typing{display:flex;gap:4px;align-items:center;padding:8px 0;}
+.typing span{width:7px;height:7px;background:var(--accent2);border-radius:50%;animation:bounce 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:.2s;}
+.typing span:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-8px);}}
+
+/* BADGES */
+.badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.badge-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;text-align:center;transition:all 0.2s;}
+.badge-item.earned{border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.05);}
+.badge-item.earned:hover{box-shadow:0 0 20px rgba(251,191,36,0.15);}
+.badge-item .badge-icon{font-size:32px;margin-bottom:8px;}
+.badge-item .badge-name{font-size:12px;font-weight:600;color:var(--text);}
+.badge-item .badge-desc{font-size:11px;color:var(--text3);margin-top:2px;}
+.badge-item:not(.earned){opacity:0.4;filter:grayscale(1);}
+
+/* GOAL CARDS */
+.goal-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.goal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
+.goal-emoji{font-size:28px;}
+.goal-pct{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:var(--accent2);}
+.goal-name{font-size:15px;font-weight:600;margin-bottom:2px;}
+.goal-amounts{font-size:12px;color:var(--text3);}
+.goal-bar{margin-top:12px;}
+
+/* ADD TXN */
+.add-txn-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:12px;font-weight:600;color:var(--text2);}
+.form-input{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--accent);}
+.form-full{grid-column:1/-1;}
+.btn{padding:12px 24px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;transition:all 0.2s;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--cyan));color:#fff;}
+.btn-primary:hover{opacity:0.88;transform:translateY(-1px);}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text);}
+
+/* STREAKS */
+.streak-banner{background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(251,191,36,0.05));border:1px solid rgba(251,191,36,0.3);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:16px;}
+.streak-fire{font-size:40px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1);};}
+.streak-info h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--yellow);}
+.streak-info p{font-size:13px;color:var(--text2);margin-top:4px;}
+
+/* INVEST */
+.portfolio-ring{display:flex;align-items:center;gap:32px;}
+.portfolio-legend{display:flex;flex-direction:column;gap:10px;}
+.legend-item{display:flex;align-items:center;gap:10px;font-size:13px;}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.legend-val{margin-left:auto;font-weight:600;font-size:14px;}
+
+/* INSIGHT CHIPS */
+.insight-list{display:flex;flex-direction:column;gap:10px;}
+.insight-item{display:flex;gap:12px;padding:14px;background:var(--bg3);border-radius:var(--radius-sm);border-left:3px solid var(--accent);align-items:flex-start;}
+.insight-item.warn{border-color:var(--yellow);}
+.insight-item.danger{border-color:var(--red);}
+.insight-item.good{border-color:var(--green);}
+.insight-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.insight-text{font-size:13px;line-height:1.6;}
+.insight-text strong{color:var(--text);}
+
+/* SUBS */
+.sub-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:8px;}
+.sub-logo{width:42px;height:42px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.sub-info{flex:1;}
+.sub-name{font-size:14px;font-weight:500;}
+.sub-next{font-size:11px;color:var(--text3);margin-top:2px;}
+.sub-price{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;}
+.sub-cancel{padding:5px 12px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:20px;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.sub-cancel:hover{background:rgba(248,113,113,0.2);}
+
+/* HEALTH RING */
+.health-center{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.health-ring-wrap{position:relative;width:160px;height:160px;}
+.health-ring-wrap svg{transform:rotate(-90deg);}
+.health-center-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.health-score-big{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--green);}
+.health-label{font-size:11px;color:var(--text3);}
+
+/* OPTIMIZE BUTTON */
+.optimize-btn{width:100%;padding:16px;background:linear-gradient(135deg,#7c5cfc,#22d3ee,#f472b6);background-size:200%;animation:gradientShift 3s ease infinite;border:none;border-radius:var(--radius);cursor:pointer;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:0.5px;transition:transform 0.2s,box-shadow 0.2s;display:flex;align-items:center;justify-content:center;gap:10px;}
+.optimize-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(124,92,252,0.4);}
+@keyframes gradientShift{0%{background-position:0%;}50%{background-position:100%;}100%{background-position:0%;}}
+
+/* NUDGE BANNER */
+.nudge{display:flex;align-items:center;gap:14px;padding:14px 18px;background:linear-gradient(135deg,rgba(124,92,252,0.1),rgba(34,211,238,0.05));border:1px solid rgba(124,92,252,0.25);border-radius:var(--radius-sm);margin-bottom:20px;font-size:13px;}
+.nudge-icon{font-size:20px;}
+.nudge strong{color:var(--accent2);}
+
+/* FORECAST */
+.forecast-alert{display:flex;gap:12px;align-items:center;padding:14px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:var(--radius-sm);margin-bottom:12px;}
+.forecast-alert .icon{font-size:20px;}
+.forecast-alert p{font-size:13px;color:var(--text2);}
+.forecast-alert strong{color:var(--text);}
+
+/* BUDGET METER */
+.budget-item{margin-bottom:14px;}
+.budget-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.budget-cat{font-size:13px;font-weight:500;}
+.budget-vals{font-size:12px;color:var(--text3);}
+.budget-vals span{font-weight:600;color:var(--text);}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .grid-4{grid-template-columns:1fr 1fr;}
+  .grid-3{grid-template-columns:1fr 1fr;}
+  .badge-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:600px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
+  .content{padding:16px;}
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* SECTION TITLE */
+.section-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.section-title span{font-size:13px;font-weight:400;color:var(--text3);margin-left:4px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">💸</div>
+    <span class="logo-text">FinFlow</span>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" onclick="goTo('dashboard',this)"><span class="icon">⚡</span> Dashboard</div>
+      <div class="nav-item" onclick="goTo('ai',this)"><span class="icon">🤖</span> AI Copilot <span class="nav-badge">NEW</span></div>
+      <div class="nav-item" onclick="goTo('transactions',this)"><span class="icon">💳</span> Transactions</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Insights</div>
+      <div class="nav-item" onclick="goTo('budget',this)"><span class="icon">📊</span> Budget</div>
+      <div class="nav-item" onclick="goTo('goals',this)"><span class="icon">🎯</span> Goals</div>
+      <div class="nav-item" onclick="goTo('subscriptions',this)"><span class="icon">🔄</span> Subscriptions</div>
+      <div class="nav-item" onclick="goTo('invest',this)"><span class="icon">📈</span> Investments</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">You</div>
+      <div class="nav-item" onclick="goTo('health',this)"><span class="icon">🏆</span> Health Score</div>
+      <div class="nav-item" onclick="goTo('rewards',this)"><span class="icon">🎖️</span> Rewards</div>
+    </div>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar">AK</div>
+      <div class="user-info"><div class="name">Aryan K.</div><div class="plan">✦ Pro Member</div></div>
+      <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀️</button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="page-title" id="pageTitle">Dashboard</div>
+    <div class="topbar-right">
+      <div class="health-score">🏆 Health: 78/100</div>
+      <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+    </div>
+  </div>
+  <div class="content" id="content">
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="nudge"><span class="nudge-icon">✨</span><div>Your <strong>daily nudge:</strong> You spent ₹1,200 on food this week — 18% less than last week. Keep it up!</div></div>
+
+      <div class="grid-4" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Monthly Spend</span><div class="card-icon" style="background:rgba(248,113,113,0.15);">💸</div></div>
+          <div class="stat-value">₹38,240</div>
+          <div class="stat-sub">vs ₹42,100 last month</div>
+          <div class="stat-change down">↓ 9.2% down</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Total Saved</span><div class="card-icon" style="background:rgba(52,211,153,0.15);">💰</div></div>
+          <div class="stat-value">₹14,800</div>
+          <div class="stat-sub">Goal: ₹20,000/month</div>
+          <div class="stat-change up">↑ 12% vs last</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Net Worth</span><div class="card-icon" style="background:rgba(124,92,252,0.15);">📈</div></div>
+          <div class="stat-value">₹2.4L</div>
+          <div class="stat-sub">+₹18k this month</div>
+          <div class="stat-change up">↑ 8.1% MoM</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Streak</span><div class="card-icon" style="background:rgba(251,191,36,0.15);">🔥</div></div>
+          <div class="stat-value">23 days</div>
+          <div class="stat-sub">Budget stayed on track</div>
+          <div class="stat-change up">🏆 Best ever!</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-header"><div class="section-title" style="margin:0;">Spending Trend</div>
+          <select class="form-input" style="width:auto;padding:5px 10px;font-size:12px;"><option>6 Months</option><option>3 Months</option><option>1 Year</option></select></div>
+          <div class="chart-wrap"><canvas id="spendChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="section-title" style="margin:0;">Category Split</div></div>
+          <div class="chart-wrap"><canvas id="catChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-header"><div class="section-title" style="margin:0;">Recent Transactions</div><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;" onclick="goTo('transactions',null)">View All</button></div>
+          <div class="txn-list">
+            <div class="txn-item"><div class="txn-icon" style="background:rgba(251,113,133,0.15);">🍕</div><div class="txn-info"><div class="txn-name">Swiggy</div><div class="txn-meta">Food • Today</div></div><div class="txn-amt debit">−₹480</div></div>
+            <div class="txn-item"><div class="txn-icon" style="background:rgba(34,211,238,0.15);">🎵</div><div class="txn-info"><div class="txn-name">Spotify Premium</div><div class="txn-meta">Subscription • Yesterday</div></div><div class="txn-amt debit">−₹119</div></div>
+            <div class="txn-item"><div class="txn-icon" style="background:rgba(52,211,153,0.15);">💼</div><div class="txn-info"><div class="txn-name">Salary Credit</div><div class="txn-meta">Income • 1 Jul</div></div><div class="txn-amt credit">+₹53,000</div></div>
+            <div class="txn-item"><div class="txn-icon" style="background:rgba(251,191,36,0.15);">🛒</div><div class="txn-info"><div class="txn-name">Zepto Groceries</div><div class="txn-meta">Groceries • 2 Jul</div></div><div class="txn-amt debit">−₹1,240</div></div>
+            <div class="txn-item"><div class="txn-icon" style="background:rgba(244,114,182,0.15);">✈️</div><div class="txn-info"><div class="txn-name">IndiGo Flight</div><div class="txn-meta">Travel • 30 Jun</div></div><div class="txn-amt debit">−₹4,200</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="section-title" style="margin:0;">Behavioral Insights</div></div>
+          <div class="insight-list">
+            <div class="insight-item danger"><span class="insight-icon">⚠️</span><div class="insight-text"><strong>Overspending Alert:</strong> Your food delivery spend is ₹6,800 this month — 36% over budget. Try cooking 2 meals/week to save ~₹2,000.</div></div>
+            <div class="insight-item warn"><span class="insight-icon">💡</span><div class="insight-text"><strong>Unused Subscription:</strong> You haven't used Hotstar in 3 weeks. Pausing it saves ₹299/month.</div></div>
+            <div class="insight-item good"><span class="insight-icon">✅</span><div class="insight-text"><strong>Great habit:</strong> You transferred ₹5,000 to savings 3 months in a row. Auto-SIP could automate this for you.</div></div>
+            <div class="insight-item"><span class="insight-icon">📉</span><div class="insight-text"><strong>Forecast:</strong> At current pace, you'll overspend by ₹3,100 before month end. Consider reducing weekend dining.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="optimize-btn" onclick="runOptimize()">⚡ Optimize My Finances — One Click</button>
+    </div>
+
+    <!-- AI COPILOT -->
+    <div class="page" id="page-ai">
+      <div class="chat-wrap">
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg">
+            <div class="msg-avatar ai">🤖</div>
+            <div class="msg-bubble ai">Hey Aryan! 👋 I'm your FinFlow AI Copilot. I've analyzed your spending data and I'm ready to help you make smarter money moves.<br><br>Here's a quick snapshot:
+              <ul>
+                <li>💸 You've spent <strong>₹38,240</strong> this month</li>
+                <li>⚠️ Food delivery is 36% over budget</li>
+                <li>🎯 You're 74% toward your emergency fund goal</li>
+                <li>📈 Your portfolio is up <strong>+12.4%</strong> this year</li>
+              </ul>
+              What would you like to dive into?
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-wrap">
+          <div class="quick-prompts">
+            <div class="quick-prompt" onclick="sendQuick(this)">Where am I overspending?</div>
+            <div class="quick-prompt" onclick="sendQuick(this)">How can I save more?</div>
+            <div class="quick-prompt" onclick="sendQuick(this)">Best investment for beginners?</div>
+            <div class="quick-prompt" onclick="sendQuick(this)">Review my subscriptions</div>
+            <div class="quick-prompt" onclick="sendQuick(this)">Set a budget for me</div>
+          </div>
+          <div class="chat-input-row">
+            <input class="chat-input" id="chatInput" placeholder="Ask about your money..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+            <button class="chat-send-btn" id="sendBtn" onclick="sendMsg()">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="page" id="page-transactions">
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="section-title">Add Transaction</div>
+          <div class="add-txn-form">
+            <div class="form-group"><label>Name</label><input class="form-input" id="txnName" placeholder="e.g. Swiggy Order"/></div>
+            <div class="form-group"><label>Amount (₹)</label><input class="form-input" id="txnAmt" type="number" placeholder="e.g. 480"/></div>
+            <div class="form-group"><label>Category</label>
+              <select class="form-input" id="txnCat">
+                <option value="🍕 Food">🍕 Food</option>
+                <option value="🛒 Groceries">🛒 Groceries</option>
+                <option value="🎵 Subscription">🎵 Subscription</option>
+                <option value="✈️ Travel">✈️ Travel</option>
+                <option value="🏥 Health">🏥 Health</option>
+                <option value="🎮 Entertainment">🎮 Entertainment</option>
+                <option value="📚 Education">📚 Education</option>
+                <option value="💼 Income">💼 Income</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Type</label>
+              <select class="form-input" id="txnType"><option value="debit">Expense</option><option value="credit">Income</option></select>
+            </div>
+            <div class="form-group form-full"><button class="btn btn-primary" style="width:100%;" onclick="addTxn()">+ Add Transaction</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Monthly Summary</div>
+          <div class="chart-wrap"><canvas id="txnMonthChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="section-title" style="margin:0;">All Transactions</div><div id="txnCount" style="font-size:13px;color:var(--text3);"></div></div>
+        <div class="txn-list" id="txnList"></div>
+      </div>
+    </div>
+
+    <!-- BUDGET -->
+    <div class="page" id="page-budget">
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="section-title">AI Budget Planner</div>
+          <div style="margin-bottom:14px;font-size:13px;color:var(--text2);">Based on your ₹53,000 income and spending patterns, here's your recommended budget:</div>
+          <div id="budgetList"></div>
+          <button class="btn btn-primary" style="margin-top:12px;width:100%;" onclick="regenerateBudget()">🤖 Regenerate with AI</button>
+        </div>
+        <div class="card">
+          <div class="section-title">Spending vs Budget</div>
+          <div class="chart-wrap-tall"><canvas id="budgetChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Predictive Alerts</div>
+        <div class="forecast-alert"><span class="icon">⚠️</span><p><strong>Food & Dining:</strong> At ₹6,800/₹5,000 budget — you've already exceeded this month. AI recommends reducing dining out 3x this week.</p></div>
+        <div class="forecast-alert"><span class="icon">📉</span><p><strong>Entertainment:</strong> Projected to hit ₹3,200 by month end vs ₹2,500 budget. Avoid impulse purchases this weekend.</p></div>
+        <div style="padding:14px;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:var(--radius-sm);display:flex;gap:12px;align-items:center;"><span style="font-size:20px;">✅</span><p style="font-size:13px;color:var(--text2);"><strong style="color:var(--text);">Transport & Rent</strong> are on track — no action needed.</p></div>
+      </div>
+    </div>
+
+    <!-- GOALS -->
+    <div class="page" id="page-goals">
+      <div class="grid-2" style="margin-bottom:16px;" id="goalsGrid"></div>
+      <div class="card">
+        <div class="section-title">Add New Goal</div>
+        <div class="add-txn-form">
+          <div class="form-group"><label>Goal Name</label><input class="form-input" id="goalName" placeholder="e.g. Japan Trip"/></div>
+          <div class="form-group"><label>Target Amount (₹)</label><input class="form-input" id="goalTarget" type="number" placeholder="e.g. 150000"/></div>
+          <div class="form-group"><label>Current Savings (₹)</label><input class="form-input" id="goalCurrent" type="number" placeholder="e.g. 30000"/></div>
+          <div class="form-group"><label>Emoji</label><input class="form-input" id="goalEmoji" placeholder="🌍"/></div>
+          <div class="form-full"><button class="btn btn-primary" onclick="addGoal()">+ Add Goal</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBSCRIPTIONS -->
+    <div class="page" id="page-subscriptions">
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Total Monthly</span></div>
+          <div class="stat-value">₹2,187</div>
+          <div class="stat-sub">Across 8 active subscriptions</div>
+          <div class="stat-change down">⚠️ ₹598 potentially wasted</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Annual Cost</span></div>
+          <div class="stat-value">₹26,244</div>
+          <div class="stat-sub">If kept all year</div>
+          <div class="stat-change up">Save ₹7,176 by cancelling 3</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Active Subscriptions</div>
+        <div id="subList"></div>
+      </div>
+    </div>
+
+    <!-- INVESTMENTS -->
+    <div class="page" id="page-invest">
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="section-title">Portfolio Overview</div>
+          <div class="portfolio-ring">
+            <div style="flex-shrink:0;"><canvas id="portfolioChart" width="150" height="150"></canvas></div>
+            <div class="portfolio-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#7c5cfc;"></div>Mutual Funds<span class="legend-val">₹52,000</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#22d3ee;"></div>Stocks<span class="legend-val">₹28,000</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#34d399;"></div>Gold ETF<span class="legend-val">₹15,000</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:#fbbf24;"></div>FD<span class="legend-val">₹45,000</span></div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding:10px;background:rgba(52,211,153,0.1);border-radius:8px;text-align:center;font-size:13px;">Total Portfolio: <strong style="font-size:18px;font-family:Syne,sans-serif;">₹1,40,000</strong> &nbsp;|&nbsp; <span style="color:var(--green);">+₹12,400 (9.7%) YTD</span></div>
+        </div>
+        <div class="card">
+          <div class="section-title">Portfolio Growth</div>
+          <div class="chart-wrap-tall"><canvas id="growthChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">AI Beginner Picks <span>Based on your risk profile: Moderate</span></div>
+        <div class="grid-3">
+          <div class="card" style="background:var(--bg3);">
+            <div style="font-size:24px;margin-bottom:8px;">📦</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Nifty 50 Index</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Low risk · Long term</div>
+            <div style="color:var(--green);font-size:13px;font-weight:600;">+12.4% avg CAGR</div>
+            <div style="margin-top:10px;font-size:11px;color:var(--accent2);">⭐ Highly recommended</div>
+          </div>
+          <div class="card" style="background:var(--bg3);">
+            <div style="font-size:24px;margin-bottom:8px;">💛</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Digital Gold</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Hedge · Stable</div>
+            <div style="color:var(--green);font-size:13px;font-weight:600;">+8.1% avg CAGR</div>
+            <div style="margin-top:10px;font-size:11px;color:var(--text3);">Good diversifier</div>
+          </div>
+          <div class="card" style="background:var(--bg3);">
+            <div style="font-size:24px;margin-bottom:8px;">🏢</div>
+            <div style="font-size:14px;font-weight:600;margin-bottom:4px;">ELSS Mutual Fund</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Tax saving · 3yr lock</div>
+            <div style="color:var(--green);font-size:13px;font-weight:600;">+14.2% avg CAGR</div>
+            <div style="margin-top:10px;font-size:11px;color:var(--yellow);">Saves tax under 80C</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEALTH SCORE -->
+    <div class="page" id="page-health">
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="card health-center" style="padding:32px;">
+          <div class="health-ring-wrap">
+            <svg width="160" height="160" viewBox="0 0 160 160">
+              <circle cx="80" cy="80" r="68" fill="none" stroke="var(--bg3)" stroke-width="14"/>
+              <circle cx="80" cy="80" r="68" fill="none" stroke="url(#hg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="112" id="healthArc"/>
+              <defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs>
+            </svg>
+            <div class="health-center-text"><div class="health-score-big">78</div><div class="health-label">/ 100</div></div>
+          </div>
+          <div style="margin-top:16px;font-family:Syne,sans-serif;font-size:18px;font-weight:700;color:var(--green);">Good Standing</div>
+          <div style="font-size:13px;color:var(--text2);text-align:center;margin-top:6px;max-width:240px;">You're doing great! A few tweaks can push you to 90+</div>
+        </div>
+        <div class="card">
+          <div class="section-title">Score Breakdown</div>
+          <div id="healthBreakdown"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Score History</div>
+        <div class="chart-wrap"><canvas id="healthChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- REWARDS -->
+    <div class="page" id="page-rewards">
+      <div class="streak-banner" style="margin-bottom:20px;">
+        <div class="streak-fire">🔥</div>
+        <div class="streak-info">
+          <h3>23-Day Streak!</h3>
+          <p>You've stayed on budget for 23 consecutive days. Keep going to unlock "Iron Saver" badge!</p>
+        </div>
+        <div style="margin-left:auto;text-align:center;">
+          <div style="font-family:Syne,sans-serif;font-size:32px;font-weight:800;color:var(--yellow);">420</div>
+          <div style="font-size:12px;color:var(--text3);">Flow Points</div>
+        </div>
+      </div>
+      <div class="section-title">Your Badges</div>
+      <div class="badge-grid" id="badgeGrid"></div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div><!-- /app -->
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────
+let transactions = [
+  {name:'Swiggy',cat:'🍕 Food',amt:480,type:'debit',date:'Today'},
+  {name:'Spotify Premium',cat:'🎵 Subscription',amt:119,type:'debit',date:'Yesterday'},
+  {name:'Salary Credit',cat:'💼 Income',amt:53000,type:'credit',date:'1 Jul'},
+  {name:'Zepto Groceries',cat:'🛒 Groceries',amt:1240,type:'debit',date:'2 Jul'},
+  {name:'IndiGo Flight',cat:'✈️ Travel',amt:4200,type:'debit',date:'30 Jun'},
+  {name:'Amazon Prime',cat:'🎵 Subscription',amt:299,type:'debit',date:'29 Jun'},
+  {name:'Zomato',cat:'🍕 Food',amt:620,type:'debit',date:'28 Jun'},
+  {name:'Netflix',cat:'🎵 Subscription',amt:649,type:'debit',date:'27 Jun'},
+  {name:'Freelance Project',cat:'💼 Income',amt:8000,type:'credit',date:'25 Jun'},
+  {name:'Ola Cab',cat:'✈️ Travel',amt:340,type:'debit',date:'24 Jun'},
+  {name:'Gym Membership',cat:'🏥 Health',amt:1200,type:'debit',date:'20 Jun'},
+  {name:'PUBG UC',cat:'🎮 Entertainment',amt:800,type:'debit',date:'18 Jun'},
+];
+
+let goals = [
+  {name:'Emergency Fund',target:100000,current:74000,emoji:'🛡️',color:'#7c5cfc'},
+  {name:'Japan Trip',target:150000,current:42000,emoji:'🗾',color:'#22d3ee'},
+  {name:'MacBook Pro',target:200000,current:28000,emoji:'💻',color:'#f472b6'},
+  {name:'Investment SIP',target:50000,current:38000,emoji:'📈',color:'#34d399'},
+];
+
+const subscriptions = [
+  {name:'Netflix',price:649,emoji:'🎬',next:'Jul 27',used:true},
+  {name:'Spotify',price:119,emoji:'🎵',next:'Jul 30',used:true},
+  {name:'Amazon Prime',price:299,emoji:'📦',next:'Jul 29',used:true},
+  {name:'Hotstar',price:299,emoji:'📺',next:'Jul 15',used:false},
+  {name:'GPT Plus',price:1670,emoji:'🤖',next:'Jul 22',used:true},
+  {name:'Notion Pro',price:150,emoji:'📝',next:'Jul 18',used:false},
+  {name:'LinkedIn Premium',price:2499,emoji:'💼',next:'Jul 5',used:false},
+  {name:'YouTube Premium',price:189,emoji:'▶️',next:'Jul 25',used:true},
+];
+
+const budgetData = [
+  {cat:'🍕 Food & Dining',budget:5000,spent:6800,color:'#f87171'},
+  {cat:'🛒 Groceries',budget:4000,spent:3200,color:'#34d399'},
+  {cat:'🎵 Subscriptions',budget:1500,spent:2187,color:'#fbbf24'},
+  {cat:'✈️ Transport',budget:3000,spent:2100,color:'#22d3ee'},
+  {cat:'🏥 Health & Fitness',budget:2000,spent:1200,color:'#a78bfa'},
+  {cat:'🎮 Entertainment',budget:2500,spent:800,color:'#f472b6'},
+  {cat:'📚 Education',budget:2000,spent:0,color:'#fb923c'},
+  {cat:'💡 Utilities',budget:3000,spent:2800,color:'#67e8f9'},
+];
+
+const badges = [
+  {icon:'🏅',name:'First Save',desc:'Saved for the first time',earned:true},
+  {icon:'🔥',name:'7-Day Streak',desc:'7 days on budget',earned:true},
+  {icon:'💰',name:'₹10K Saved',desc:'Saved ₹10,000 total',earned:true},
+  {icon:'📊',name:'Budget Master',desc:'Under budget 2 months',earned:true},
+  {icon:'🚀',name:'Investor',desc:'First investment made',earned:true},
+  {icon:'🎯',name:'Goal Setter',desc:'Set 3 goals',earned:true},
+  {icon:'💎',name:'Iron Saver',desc:'30-day budget streak',earned:false},
+  {icon:'🦁',name:'Finance King',desc:'Score above 90',earned:false},
+];
+
+// ─── NAVIGATION ───────────────────────────────────────────────
+function goTo(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.getAttribute('onclick') && n.getAttribute('onclick').includes(id)) n.classList.add('active');
+    });
+  }
+  const titles = {dashboard:'Dashboard',ai:'AI Copilot',transactions:'Transactions',budget:'Budget',goals:'Goals',subscriptions:'Subscriptions',invest:'Investments',health:'Financial Health',rewards:'Rewards & Streaks'};
+  document.getElementById('pageTitle').textContent = titles[id] || id;
+}
+
+// ─── THEME ────────────────────────────────────────────────────
+function toggleTheme() {
+  const h = document.documentElement;
+  const isDark = h.getAttribute('data-theme') === 'dark';
+  h.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.querySelector('.theme-btn').textContent = isDark ? '🌙' : '☀️';
+  setTimeout(() => { initCharts(); }, 100);
+}
+
+// ─── CHARTS ───────────────────────────────────────────────────
+let charts = {};
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+function getStyle(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function initCharts() {
+  // Spending trend
+  destroyChart('spendChart');
+  charts.spendChart = new Chart(document.getElementById('spendChart'), {
+    type:'line',
+    data:{
+      labels:['Feb','Mar','Apr','May','Jun','Jul'],
+      datasets:[
+        {label:'Spending',data:[44200,41800,48300,42100,45600,38240],borderColor:'#f87171',backgroundColor:'rgba(248,113,113,0.1)',fill:true,tension:0.4,borderWidth:2},
+        {label:'Savings',data:[8800,11200,4700,10900,7400,14800],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.1)',fill:true,tension:0.4,borderWidth:2}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getStyle('--text2'),font:{family:'DM Sans',size:11}}}},scales:{x:{ticks:{color:getStyle('--text3'),font:{size:11}},grid:{color:getStyle('--border')}},y:{ticks:{color:getStyle('--text3'),font:{size:11},callback:v=>'₹'+v.toLocaleString()},grid:{color:getStyle('--border')}}}}
+  });
+
+  // Category donut
+  destroyChart('catChart');
+  charts.catChart = new Chart(document.getElementById('catChart'), {
+    type:'doughnut',
+    data:{
+      labels:['Food','Subscriptions','Transport','Groceries','Entertainment','Health'],
+      datasets:[{data:[6800,2187,2100,3200,800,1200],backgroundColor:['#f87171','#22d3ee','#7c5cfc','#34d399','#f472b6','#a78bfa'],borderWidth:0,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'right',labels:{color:getStyle('--text2'),font:{family:'DM Sans',size:11},boxWidth:10}}}}
+  });
+
+  // Txn month chart
+  destroyChart('txnMonthChart');
+  charts.txnMonthChart = new Chart(document.getElementById('txnMonthChart'), {
+    type:'bar',
+    data:{
+      labels:['Week 1','Week 2','Week 3','Week 4'],
+      datasets:[{label:'Expenses',data:[9200,11400,8800,8840],backgroundColor:'rgba(248,113,113,0.7)',borderRadius:6},{label:'Income',data:[53000,0,8000,0],backgroundColor:'rgba(52,211,153,0.7)',borderRadius:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getStyle('--text2'),font:{family:'DM Sans',size:11}}}},scales:{x:{ticks:{color:getStyle('--text3')},grid:{display:false}},y:{ticks:{color:getStyle('--text3'),font:{size:10},callback:v=>'₹'+v.toLocaleString()},grid:{color:getStyle('--border')}}}}
+  });
+
+  // Budget vs spend
+  destroyChart('budgetChart');
+  charts.budgetChart = new Chart(document.getElementById('budgetChart'), {
+    type:'bar',
+    data:{
+      labels:budgetData.map(b=>b.cat),
+      datasets:[
+        {label:'Budget',data:budgetData.map(b=>b.budget),backgroundColor:'rgba(124,92,252,0.3)',borderRadius:4,borderColor:'rgba(124,92,252,0.7)',borderWidth:1},
+        {label:'Spent',data:budgetData.map(b=>b.spent),backgroundColor:budgetData.map(b=>b.spent>b.budget?'rgba(248,113,113,0.7)':'rgba(52,211,153,0.7)'),borderRadius:4}
+      ]
+    },
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getStyle('--text2'),font:{size:11}}}},scales:{x:{ticks:{color:getStyle('--text3'),callback:v=>'₹'+v.toLocaleString()},grid:{color:getStyle('--border')}},y:{ticks:{color:getStyle('--text2'),font:{size:11}},grid:{display:false}}}}
+  });
+
+  // Portfolio donut
+  destroyChart('portfolioChart');
+  charts.portfolioChart = new Chart(document.getElementById('portfolioChart'), {
+    type:'doughnut',
+    data:{
+      labels:['MF','Stocks','Gold','FD'],
+      datasets:[{data:[52000,28000,15000,45000],backgroundColor:['#7c5cfc','#22d3ee','#34d399','#fbbf24'],borderWidth:0,hoverOffset:4}]
+    },
+    options:{responsive:false,cutout:'60%',plugins:{legend:{display:false}}}
+  });
+
+  // Portfolio growth
+  destroyChart('growthChart');
+  charts.growthChart = new Chart(document.getElementById('growthChart'), {
+    type:'line',
+    data:{
+      labels:['Jan','Feb','Mar','Apr','May','Jun','Jul'],
+      datasets:[{label:'Portfolio Value',data:[105000,108000,112000,115000,119000,124000,140000],borderColor:'#7c5cfc',backgroundColor:'rgba(124,92,252,0.15)',fill:true,tension:0.4,borderWidth:2,pointBackgroundColor:'#7c5cfc'}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getStyle('--text2'),font:{size:11}}}},scales:{x:{ticks:{color:getStyle('--text3')},grid:{color:getStyle('--border')}},y:{ticks:{color:getStyle('--text3'),callback:v=>'₹'+v.toLocaleString()},grid:{color:getStyle('--border')}}}}
+  });
+
+  // Health score chart
+  destroyChart('healthChart');
+  charts.healthChart = new Chart(document.getElementById('healthChart'), {
+    type:'line',
+    data:{
+      labels:['Feb','Mar','Apr','May','Jun','Jul'],
+      datasets:[{label:'Health Score',data:[62,65,70,68,74,78],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.1)',fill:true,tension:0.4,borderWidth:2,pointBackgroundColor:'#34d399',pointRadius:5}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:getStyle('--text2'),font:{size:11}}}},scales:{x:{ticks:{color:getStyle('--text3')},grid:{color:getStyle('--border')}},y:{min:40,max:100,ticks:{color:getStyle('--text3')},grid:{color:getStyle('--border')}}}}
+  });
+}
+
+// ─── TRANSACTIONS ─────────────────────────────────────────────
+const catColors = {'🍕 Food':'rgba(251,113,133,0.15)','🛒 Groceries':'rgba(251,191,36,0.15)','🎵 Subscription':'rgba(34,211,238,0.15)','✈️ Travel':'rgba(244,114,182,0.15)','🏥 Health':'rgba(167,139,250,0.15)','🎮 Entertainment':'rgba(124,92,252,0.15)','📚 Education':'rgba(251,191,36,0.15)','💼 Income':'rgba(52,211,153,0.15)'};
+
+function renderTxns() {
+  const list = document.getElementById('txnList');
+  document.getElementById('txnCount').textContent = transactions.length + ' transactions';
+  list.innerHTML = transactions.map((t,i) => `
+    <div class="txn-item">
+      <div class="txn-icon" style="background:${catColors[t.cat]||'rgba(124,92,252,0.15)'};">${t.cat.split(' ')[0]}</div>
+      <div class="txn-info"><div class="txn-name">${t.name}</div><div class="txn-meta">${t.cat} • ${t.date}</div></div>
+      <div class="txn-amt ${t.type}">${t.type==='debit'?'−':'+'} ₹${t.amt.toLocaleString()}</div>
+    </div>`).join('');
+}
+
+function addTxn() {
+  const name = document.getElementById('txnName').value.trim();
+  const amt = parseFloat(document.getElementById('txnAmt').value);
+  const cat = document.getElementById('txnCat').value;
+  const type = document.getElementById('txnType').value;
+  if (!name || !amt) return;
+  transactions.unshift({name,cat,amt,type,date:'Just now'});
+  renderTxns();
+  document.getElementById('txnName').value='';
+  document.getElementById('txnAmt').value='';
+}
+
+// ─── BUDGET ───────────────────────────────────────────────────
+function renderBudget() {
+  document.getElementById('budgetList').innerHTML = budgetData.map(b => {
+    const pct = Math.min(100, (b.spent/b.budget)*100);
+    const over = b.spent > b.budget;
+    const col = over ? 'var(--red)' : 'var(--green)';
+    return `<div class="budget-item">
+      <div class="budget-row"><span class="budget-cat">${b.cat}</span><span class="budget-vals">₹${b.spent.toLocaleString()} / <span>₹${b.budget.toLocaleString()}</span></span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${col};"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function regenerateBudget() {
+  const btn = event.target;
+  btn.textContent = '⏳ AI is thinking...';
+  btn.disabled = true;
+  setTimeout(() => {
+    budgetData.forEach(b => { b.budget = Math.round(b.budget * (0.9 + Math.random() * 0.2)); });
+    renderBudget();
+    destroyChart('budgetChart'); initCharts();
+    btn.textContent = '🤖 Regenerate with AI';
+    btn.disabled = false;
+  }, 1400);
+}
+
+// ─── GOALS ────────────────────────────────────────────────────
+function renderGoals() {
+  document.getElementById('goalsGrid').innerHTML = goals.map((g,i) => {
+    const pct = Math.round((g.current/g.target)*100);
+    return `<div class="goal-card">
+      <div class="goal-header">
+        <div><div class="goal-emoji">${g.emoji}</div><div class="goal-name">${g.name}</div><div class="goal-amounts">₹${g.current.toLocaleString()} of ₹${g.target.toLocaleString()}</div></div>
+        <div class="goal-pct">${pct}%</div>
+      </div>
+      <div class="goal-bar"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${g.color};"></div></div></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--text3);">AI tip: Save ₹${Math.round((g.target-g.current)/6).toLocaleString()}/month to reach this in 6 months</div>
+    </div>`;
+  }).join('');
+}
+
+function addGoal() {
+  const name = document.getElementById('goalName').value.trim();
+  const target = parseFloat(document.getElementById('goalTarget').value);
+  const current = parseFloat(document.getElementById('goalCurrent').value)||0;
+  const emoji = document.getElementById('goalEmoji').value.trim()||'🎯';
+  if (!name || !target) return;
+  const colors = ['#7c5cfc','#22d3ee','#f472b6','#fbbf24','#34d399'];
+  goals.push({name,target,current,emoji,color:colors[goals.length%colors.length]});
+  renderGoals();
+  ['goalName','goalTarget','goalCurrent','goalEmoji'].forEach(id => document.getElementById(id).value='');
+}
+
+// ─── SUBSCRIPTIONS ────────────────────────────────────────────
+function renderSubs() {
+  document.getElementById('subList').innerHTML = subscriptions.map((s,i) => `
+    <div class="sub-item" id="sub-${i}">
+      <div class="sub-logo">${s.emoji}</div>
+      <div class="sub-info">
+        <div class="sub-name">${s.name} ${!s.used?'<span style="background:rgba(248,113,113,0.15);color:var(--red);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;">Unused</span>':''}</div>
+        <div class="sub-next">Renews ${s.next}</div>
+      </div>
+      <div class="sub-price">₹${s.price}/mo</div>
+      ${!s.used?`<button class="sub-cancel" onclick="cancelSub(${i})">Cancel</button>`:'<span style="font-size:11px;color:var(--green);">✓ Active</span>'}
+    </div>`).join('');
+}
+
+function cancelSub(i) {
+  if (confirm(`Cancel ${subscriptions[i].name}? This saves ₹${subscriptions[i].price}/month.`)) {
+    subscriptions.splice(i,1);
+    renderSubs();
+  }
+}
+
+// ─── HEALTH BREAKDOWN ─────────────────────────────────────────
+function renderHealthBreakdown() {
+  const items = [
+    {label:'Savings Rate',score:82,color:'#34d399'},
+    {label:'Budget Adherence',score:72,color:'#7c5cfc'},
+    {label:'Debt Ratio',score:90,color:'#22d3ee'},
+    {label:'Investment Activity',score:68,color:'#f472b6'},
+    {label:'Emergency Fund',score:74,color:'#fbbf24'},
+  ];
+  document.getElementById('healthBreakdown').innerHTML = items.map(it => `
+    <div class="budget-item">
+      <div class="budget-row"><span class="budget-cat">${it.label}</span><span style="font-weight:700;color:${it.color};">${it.score}/100</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${it.score}%;background:${it.color};"></div></div>
+    </div>`).join('');
+}
+
+// ─── BADGES ───────────────────────────────────────────────────
+function renderBadges() {
+  document.getElementById('badgeGrid').innerHTML = badges.map(b => `
+    <div class="badge-item ${b.earned?'earned':''}">
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+    </div>`).join('');
+}
+
+// ─── AI CHAT ──────────────────────────────────────────────────
+const aiReplies = {
+  'where am i overspending': `Great question! Here's where your money is going over budget this month:\n\n🍕 **Food & Dining** — ₹6,800 spent vs ₹5,000 budget (36% over)\n🎵 **Subscriptions** — ₹2,187 spent vs ₹1,500 budget (46% over)\n\n**Quick wins:**\n- Cook 2 meals/week → saves ~₹2,000\n- Cancel Hotstar + LinkedIn (unused) → saves ₹2,798\n\nWant me to auto-adjust your budget?`,
+  'how can i save more': `Based on your spending patterns, here are 4 high-impact moves:\n\n1. **Cancel unused subs** → +₹2,798/month\n2. **Reduce food delivery to 3x/week** → +₹2,000/month\n3. **Auto-SIP ₹5,000** into Nifty 50 Index fund\n4. **Round-up savings** — auto-save spare change from each purchase\n\nIf you do all 4, you could save an extra **₹9,798/month** — that's ₹1.17L/year! 🚀`,
+  'best investment for beginners': `For someone your age with a moderate risk profile, I recommend:\n\n📦 **Nifty 50 Index Fund** — Start with ₹2,000 SIP. Low cost, high diversification.\n💛 **Digital Gold** — Hedge against inflation. Buy ₹500-1000/month.\n🏢 **ELSS Fund** — Saves tax under Section 80C + good returns.\n\n**Rule of thumb:** Invest 20% of income = ₹10,600/month for you.\n\nStart with just ₹2,000 — the habit matters more than the amount. Want me to set up a goal for this?`,
+  'review my subscriptions': `You have **8 subscriptions** costing **₹2,187/month** (₹26,244/year).\n\n🔴 **Cancel these (unused):**\n- Hotstar — ₹299/mo (not used in 3 weeks)\n- LinkedIn Premium — ₹2,499/mo (!)\n- Notion Pro — ₹150/mo\n\nTotal savings: **₹2,948/month** = **₹35,376/year** 🤯\n\nWant me to find cheaper alternatives for any of these?`,
+  'set a budget for me': `Based on your ₹53,000 income and past 3 months of data, here's your AI budget:\n\n🍕 Food: ₹5,000\n🛒 Groceries: ₹4,000\n🏠 Rent/EMI: ₹15,000\n🎵 Subs: ₹1,200\n✈️ Transport: ₹3,000\n🏥 Health: ₹2,000\n🎮 Entertainment: ₹2,000\n📦 Investments: ₹10,600\n💰 Savings: ₹5,000\n🔧 Misc: ₹5,200\n\nThis follows the **50/30/20 rule** adjusted for your lifestyle. Apply it?`,
+};
+
+function getAIReply(msg) {
+  const lower = msg.toLowerCase();
+  for (const [key, val] of Object.entries(aiReplies)) {
+    if (lower.includes(key.split(' ')[0]) || lower.includes(key.split(' ').slice(-1)[0])) return val;
+  }
+  if (lower.includes('spend') || lower.includes('budget')) return aiReplies['where am i overspending'];
+  if (lower.includes('save') || lower.includes('saving')) return aiReplies['how can i save more'];
+  if (lower.includes('invest')) return aiReplies['best investment for beginners'];
+  if (lower.includes('sub')) return aiReplies['review my subscriptions'];
+  return `That's a great question! Based on your financial profile:\n\n📊 You're earning **₹53,000/month** and spending **₹38,240** — a savings rate of **27.8%** which is above average!\n\n💡 My top 3 suggestions for you right now:\n1. Cancel 3 unused subscriptions → save ₹2,948/mo\n2. Start a ₹5,000 SIP in Nifty 50\n3. Set up auto-transfer to emergency fund on salary day\n\nAnything specific you'd like to dive deeper into?`;
+}
+
+function formatAIMsg(text) {
+  return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>').replace(/^(\d+\. )/gm,'').replace(/<br\/>([\d]+\. )/g,'<br/>$1');
+}
+
+async function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  appendMsg(msg, 'user');
+  document.getElementById('sendBtn').disabled = true;
+  const typing = appendTyping();
+  await new Promise(r => setTimeout(r, 1000 + Math.random()*800));
+  typing.remove();
+  const reply = getAIReply(msg);
+  appendMsg(reply, 'ai');
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function sendQuick(el) {
+  document.getElementById('chatInput').value = el.textContent;
+  sendMsg();
+}
+
+function appendMsg(text, role) {
+  const wrap = document.getElementById('chatMessages');
+  const d = document.createElement('div');
+  d.className = `msg ${role}`;
+  d.innerHTML = `<div class="msg-avatar ${role}">${role==='ai'?'🤖':'AK'}</div><div class="msg-bubble ${role}">${role==='ai'?formatAIMsg(text):text}</div>`;
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+  return d;
+}
+
+function appendTyping() {
+  const wrap = document.getElementById('chatMessages');
+  const d = document.createElement('div');
+  d.className = 'msg';
+  d.innerHTML = `<div class="msg-avatar ai">🤖</div><div class="msg-bubble ai"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  wrap.appendChild(d);
+  wrap.scrollTop = wrap.scrollHeight;
+  return d;
+}
+
+// ─── OPTIMIZE ─────────────────────────────────────────────────
+function runOptimize() {
+  const btn = event.target.closest('button');
+  btn.textContent = '⏳ Analyzing your finances...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.innerHTML = '⚡ Optimize My Finances — One Click';
+    btn.disabled = false;
+    alert('✅ Finance Optimization Complete!\n\n🔴 Cancelled: Hotstar, Notion Pro (saves ₹449/mo)\n📦 Auto-SIP set: ₹2,000 → Nifty 50\n💰 Auto-transfer: ₹5,000 → Emergency Fund\n📉 Budget adjusted for next month\n\nEstimated monthly savings boost: +₹7,449 🎉');
+  }, 2200);
+}
+
+// ─── INIT ──────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  renderTxns();
+  renderBudget();
+  renderGoals();
+  renderSubs();
+  renderBadges();
+  renderHealthBreakdown();
+  setTimeout(initCharts, 100);
+});
+</script>
+</body>
+</html>
