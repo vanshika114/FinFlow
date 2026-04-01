@@ -1,0 +1,46 @@
+{
+  "name": "finflow",
+  "version": "1.0.0",
+  "description": "AI-Powered Personal Finance Bodyguard for Gen Z — Protex Hackathon 2026",
+  "main": "src/pages/App.jsx",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js,.jsx",
+    "format": "prettier --write src/**/*.{js,jsx,css}"
+  },
+  "keywords": [
+    "fintech",
+    "gen-z",
+    "personal-finance",
+    "ai",
+    "budgeting",
+    "investment",
+    "hackathon"
+  ],
+  "author": "FinFlow Team",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "chart.js": "^4.4.1",
+    "react-chartjs-2": "^5.2.0",
+    "axios": "^1.6.2",
+    "dayjs": "^1.11.10",
+    "zustand": "^4.4.7",
+    "framer-motion": "^10.16.16",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react": "^7.33.2",
+    "prettier": "^3.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
